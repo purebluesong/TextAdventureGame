@@ -1,26 +1,44 @@
 #-*- coding: utf-8 -*-
+#@sprout
 #第一个参数是打印文本
 #第二个参数是选择这条线以后出现的对话
 #第三个参数是其指向的新路线
 #下面是一个例子
 
 #计算机对话，第二个参数的第一项如果是-1表示故事结束
-live_in_net_cpt_msg = [
-		['help!\nhelp!\nhelp!\n',[0,1]],
-		['thanks god,finally someone to help me out\n',[2]],
-		['oh my god!',[-1]],
-	]
+cpt_msg = open("cpt_msg.txt").read().splitlines()
+
+live_in_net_cpt_msg = []
+
+#这里对话和后面数字间用‘|’分开，-1我设置为在文件中为‘#’，偷个懒@mooc@sprout
+for cpt_line in cpt_msg:
+	params = cpt_line.split('|')
+	talk = []
+	talk.append(params[0])
+	if params[1]=='#':
+		talk.append([-1])
+	else:
+		nums = []
+		for item in params[1:]:
+			nums.append(int(item))
+		talk.append(nums)
+		live_in_net_cpt_msg.append(talk)
+
 #玩家对话，第二个参数如果是-1，表示故事结束
-live_in_net_ply_chs = [
-		['what\'s wrong?',1],
-		['is this joking?',1],
-        ['Sorry i am coding,we speak later',2],
-	]
+ply_chs = open("ply_chs.txt").read().splitlines()
+
+live_in_net_ply_chs = []
+#玩家对话后面直接接数字//数字可能超出个位数，所以也仿照上面的用|分开了@mooc@sprout
+for ply_line in ply_chs:
+	params = ply_line.split('|')
+	talk = []
+	talk.append(params[0])
+	talk.append(int(params[1]))
+	live_in_net_ply_chs.append(talk)
+
 
 #每一个故事都是这样的一个列表,第一项表示AI对话，第二项表示玩家选择
 story_live_in_net = [live_in_net_cpt_msg,live_in_net_ply_chs]
-
-
 
 story_test = []
 
@@ -37,9 +55,8 @@ def output(msg=''):
 
 #游戏开始时选择故事的部分
 def choose_story():
-	print 'Please choose your storys: '
+	output('Please choose your storys: ')
 	i=0
-	story = None
 	for item in storys.keys():
 		i+=1
 		output(str(i)+':'+item)
@@ -52,9 +69,10 @@ def get_next_message_from_story(story,num):
 	for point in story[0][num][1]:
 		output(str(i)+':'+story[1][point][0])
 		i+=1
-	choosednum = story[0][num][1][int(input('your choose:'))]
-	if choosednum<0:
-		return -1
+		choosednum = story[0][num][1][int(input('your choose:'))]
+		output(story[1][choosednum][0])
+		if choosednum<0:
+			return -1
 	return story[1][choosednum][1]
 
 
